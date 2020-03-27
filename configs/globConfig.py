@@ -107,6 +107,6 @@ def parse_data(data):
                 account_id = get_player_account_id(int(__parse_data_tmp['roleid']))
                 pay(account_id, __parse_data_tmp['taskid'])
     except Exception as err:
+        print("【ERROR】{}".format(err))
         with open('errlog.log', 'a+', encoding='utf8') as errlog:
-            print("【ERROR】{}".format(errlog))
-            errlog.write("【ERROR】{}".format(errlog))
+            errlog.write("【ERROR】{}".format(err))
