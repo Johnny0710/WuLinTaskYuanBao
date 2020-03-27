@@ -5,8 +5,9 @@ from datetime import datetime
 
 
 import pymysql
-from configs.yuanbao import task_wing
+# from configs.yuanbao import task_wing
 from configs.tools import int_to_bit_set, parse_account_id
+from configs.yuanbao import get_task_wing_num
 
 configs = configparser.ConfigParser()
 
@@ -64,7 +65,7 @@ def pay(account_id, taskid):
     #    in cash1     INTEGER,
     #    in status1     INTEGER,
     #    out     error    INTEGER
-    wing_num = int(task_wing.get(taskid))
+    wing_num = int(get_task_wing_num(taskid))
     with open('log.log', 'a+') as log:
         print("【INFO】正在为账号ID:[{}]充值通过任务ID:[{}]获得的[{}]银元宝\n".format(account_id, taskid, wing_num))
         log.write("【INFO】正在为账号ID:[{}]充值通过任务ID:[{}]获得的[{}]银元宝\n".format(account_id, taskid, wing_num))
@@ -82,7 +83,11 @@ def pay(account_id, taskid):
 
 def parse_task_finish_data(task_data):
     __ = dict()
-    task_list = task_data.split("gamed")[-2]
+    for lis in task_data.split("gamed"):
+        if 'success' in lis:
+            task_list = lis
+            break
+
     task_list = task_list.split(":")[1:]
 
     for _tmp in task_list:
@@ -96,10 +101,12 @@ def parse_data(data):
         __data_tmp = codecs.raw_unicode_escape_decode(data)[0]
         if "success" in __data_tmp:  # decode()解码收到的字节
             __parse_data_tmp = parse_task_finish_data(__data_tmp)
-            if int(__parse_data_tmp['success']) == 1 and __parse_data_tmp['taskid'] in task_wing:
+            print(__parse_data_tmp)
+            # print(int(get_task_wing_num('taskid')))
+            if int(__parse_data_tmp['success']) == 1 and int(get_task_wing_num(__parse_data_tmp['taskid'])) > 0:
                 account_id = get_player_account_id(int(__parse_data_tmp['roleid']))
                 pay(account_id, __parse_data_tmp['taskid'])
     except Exception as err:
-        with open('errlog.log', 'a+') as errlog:
+        with open('errlog.log', 'a+', encoding='utf8') as errlog:
             print("【ERROR】{}".format(errlog))
             errlog.write("【ERROR】{}".format(errlog))

@@ -1,7 +1,8 @@
 build/
 dist/
 1.ico
-log.log
+*.log
 .idea/
-
+sword_dance.spec
+yuanbao.txt
 
