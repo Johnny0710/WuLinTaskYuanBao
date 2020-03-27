@@ -4,5 +4,5 @@ dist/
 *.log
 .idea/
 sword_dance.spec
-yuanbao.txt
+*.txt
 
